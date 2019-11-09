@@ -33,19 +33,22 @@
             }
 
             async componentDidMount() {
-                const guests = (await axios.get('/api/guests')).data;
+              console.log('mounted')
+                const guests = (await axios.get('/api/guests') ).data;
+                console.log(guests)
 
                 //console.log(guests)
-                this.setState({ guests });
+                this.setState({ ...this.state , guests});
             }
             addGuest = async (name) => {
-                const guest = (await axios.post('/api/guests', { name })).data;
-                this.setState({ ...this.state, guest })
+                console.log('adding guest...', name)
+                const guests = (await axios.post('/api/guests', { name })).data;
+                console.log('guests response', guests)
+                this.setState({...this.state, guests})
 
             }
 
             render() {
-                console.log('passed into render:', this.state.guests)
                 const { guests } = this.state;
                 if (!guests.length) {
                     return <div>No Guests Yet...</div>
@@ -53,7 +56,7 @@
                 return (
                     <div>
                         <h1>The Acme Guest Book</h1>
-                        <form>
+                        <form onSubmit={(e)=>{e.preventDefault()}}>
                             <input type='text' onChange={(ev) => this.setState({ guest: ev.target.value })} />
                             <button onClick={() => this.addGuest(this.state.guest)}>sign in</button>
                         </form>
