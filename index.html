@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Acme Guest-books</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/6.26.0/babel.js"></script>
+    <script crossorigin src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script crossorigin src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.19.0/axios.js"></script>
+    <script crossorigin
+        src="https://cdnjs.cloudflare.com/ajax/libs/react-router-dom/5.1.2/react-router-dom.js"></script>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" async defer>
+        const { HashRouter, Link, Route, Switch, Redirect } = ReactRouterDOM;
+        const { Component } = React;
+        const root = document.querySelector('#root');
+
+        class App extends Component {
+            constructor() {
+                super();
+                this.state = {
+                    guests: [],
+                    guest: ''
+                };
+            }
+
+            async componentDidMount() {
+                const guests = (await axios.get('/api/guests')).data;
+
+                //console.log(guests)
+                this.setState({ guests });
+            }
+            addGuest = async (name) => {
+                const guest = (await axios.post('/api/guests', { name })).data;
+                this.setState({ ...this.state, guest })
+
+            }
+
+            render() {
+                console.log('passed into render:', this.state.guests)
+                const { guests } = this.state;
+                if (!guests.length) {
+                    return <div>No Guests Yet...</div>
+                }
+                return (
+                    <div>
+                        <h1>The Acme Guest Book</h1>
+                        <form>
+                            <input type='text' onChange={(ev) => this.setState({ guest: ev.target.value })} />
+                            <button onClick={() => this.addGuest(this.state.guest)}>sign in</button>
+                        </form>
+                        <ul>
+                            {guests.map(guest => <li key={guest.id}>{guest.name}</li>)}
+                        </ul>
+                    </div>
+                )
+            }
+        }
+
+        ReactDOM.render(React.createElement(App), root);
+    </script>
+</body>
+
+</html>
